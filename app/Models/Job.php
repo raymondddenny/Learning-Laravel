@@ -3,39 +3,26 @@
 namespace App\Models;
 
 
-use Illuminate\Support\Arr;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class Job
+class Job extends Model
 {
-    public static function find(int $id): array
+    use HasFactory;
+
+    protected $table = 'job_listings';
+    protected $fillable = [
+        'title',
+        'salary'
+    ];
+
+    public function employer()
     {
-        $job = Arr::first(self::all(), fn($job) => $job['id'] == $id);
-
-        if (!$job) {
-            abort(404);
-        }
-
-        return $job;
+        return $this->belongsTo(Employer::class);
     }
 
-    public static function all(): array
+    public function tags()
     {
-        return [
-            [
-                'id' => '1',
-                'title' => 'Director',
-                'salary' => '$1000',
-            ],
-            [
-                'id' => '2',
-                'title' => 'Manager',
-                'salary' => '$800',
-            ],
-            [
-                'id' => '3',
-                'title' => 'Developer',
-                'salary' => '$500',
-            ],
-        ];
+        return $this->belongsToMany(Tag::class, foreignPivotKey: 'job_listing_id');
     }
 }
